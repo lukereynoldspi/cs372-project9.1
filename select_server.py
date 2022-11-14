@@ -7,8 +7,23 @@ import socket
 import select
 
 def run_server(port):
-    # TODO--fill this in
-    pass
+    server_socket = socket.socket()
+    server_socket.bind(('', port))
+    server_socket.listen()
+
+    socket_set = {server_socket}
+
+    while True:
+        read, _, _ = select.select(socket_set, {}, {})
+        for s in read:
+            print(s.getpeername())
+            if s == server_socket:
+                new_socket = s.accept()
+                socket_set.add(new_socket)
+            else:
+                data = s.recv(4096)
+                if data == 0:
+                    socket_set.remove(s)
 
 #--------------------------------#
 # Do not modify below this line! #
