@@ -7,23 +7,29 @@ import socket
 import select
 
 def run_server(port):
+    # Creates listener socket
     server_socket = socket.socket()
     server_socket.bind(('', port))
     server_socket.listen()
 
+    # Adds listener socket to a new set
     socket_set = {server_socket}
 
     while True:
         read, _, _ = select.select(socket_set, {}, {})
         for s in read:
-            if s == server_socket:
+            
+            # Checks if it is listener socket
+            if s == server_socket: 
                 new_socket, _ = server_socket.accept()
                 print(str(new_socket.getpeername()) + ": connected")
                 socket_set.add(new_socket)
+
+            # Regular socket, recieves data
             else:
-                data = s.recv(4096)
+                data = s.recv(4096) 
                 if not data:
-                    print(str(s.getpeername()) + ": disconnected")
+                    print(str(s.getpeername()) + ": disconnected") # Disconnects if no more data
                     socket_set.remove(s)
                 else:
                     print(str(s.getpeername()) + " " + str(len(data)) + " bytes: " + str(data))
