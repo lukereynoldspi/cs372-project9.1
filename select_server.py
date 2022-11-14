@@ -16,15 +16,17 @@ def run_server(port):
     while True:
         read, _, _ = select.select(socket_set, {}, {})
         for s in read:
-            print(s.getpeername())
             if s == server_socket:
-                new_socket = s.accept()
+                new_socket, _ = server_socket.accept()
+                print(str(new_socket.getpeername()) + ": connected")
                 socket_set.add(new_socket)
             else:
                 data = s.recv(4096)
-                if data == 0:
+                if not data:
+                    print(str(s.getpeername()) + ": disconnected")
                     socket_set.remove(s)
-
+                else:
+                    print(str(s.getpeername()) + " " + str(len(data)) + " bytes: " + str(data))
 #--------------------------------#
 # Do not modify below this line! #
 #--------------------------------#
